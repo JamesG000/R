@@ -1,0 +1,9 @@
+a <- ggplot(df, aes(x=Treatment, y=Area)) +
+  geom_boxplot()+
+  stat_boxplot(aes(Treatment, Area), geom='errorbar', linetype=1, width=0.5)+
+  stat_summary(data = final_df, fun.y = mean, color = "red", position = position_dodge(0.75),geom = "point", shape = 18, size = 3, show.legend = FALSE)+
+  stat_summary(fun.data = mean_se, geom = "errorbar", color="red")+
+  xlab(bquote('Treatment')) + #removes the guide
+  theme(panel.background = element_blank(), axis.line = element_line(colour = "black"), panel.grid.minor = element_line())  #editing the graph background
+plot(a)
+ggsave("Figures/Leaf Area.png",plot=a)
