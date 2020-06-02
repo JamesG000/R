@@ -1,0 +1,11 @@
+k<-ggplot(data=df2, aes(x=height, y=Mean, ymax=Mean+SE,ymin=Mean-SE,group=Species, colour=Species)) +
+  geom_line()+
+  geom_errorbar()+
+  ylab(bquote('Mean Species Abundance')) +
+  xlab(bquote('Shore Height')) +
+  scale_x_continuous(limits=c(0,5))+
+  coord_flip()+
+  theme(panel.background = element_blank(), axis.line = element_line(colour = "black"), 
+        panel.grid.minor = element_line())+
+  theme(legend.text = element_text(face = "italic"))
+plot(k)
