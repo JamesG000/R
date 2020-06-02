@@ -1,0 +1,1 @@
+mean_and_sd$Stable_cell <- ifelse(mean_and_sd$Mean<mean_and_sd$SD,"Yes",ifelse(mean_and_sd$Mean > mean_and_sd$SD,"No",NA))
