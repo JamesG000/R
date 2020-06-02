@@ -1,0 +1,20 @@
+
+#overall species divs
+Alpha <- df %>%
+  group_by(Site, Transect) %>%
+  na.omit() %>%
+  summarise(
+    Richness = specnumber(Abundance),
+    Evenness = diversity(Abundance, index = "simpson"),
+    Diversity = diversity(Abundance, index = "shannon"))
+
+#psuedo replicates
+P_Alpha <- Alpha %>%
+  group_by(Site) %>%
+  na.omit() %>%
+  summarise(
+    N=n(),
+    Richness = mean(Richness),
+    Evenness = mean(Evenness),
+    Diversity = mean(Diversity)
+  )
