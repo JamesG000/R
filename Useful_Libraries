@@ -1,0 +1,7 @@
+library(dplyr) #%>%
+library(plyr) #rbind.fill
+library(tidyr)  #gather function
+library(ggpubr) #ggarrange
+library(ggplot2) #ggplot
+library(betapart) #comparing beta diversity
+library(vegan) #several diversity indeceis
