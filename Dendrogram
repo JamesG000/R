@@ -1,0 +1,13 @@
+
+df <- read.csv("Data/matrix.csv")
+df1 <- t(df)
+
+dd <- dist(scale(df1), method = "euclidean")
+hc <- hclust(dd, method = "ward.D2")
+
+a <- plot(hc, hang = -1, xlab = "Species", sub ="", main = "Species Relatedness", mar = (4,4,1,1))
+
+tiff("Figures/Den.tiff", 16, 8, units="cm", res=600, compression="lzw") ###create a tif called this xxxx with these dimentions, resolution, and compresion
+par(mar=c(4,4,1,1), mfrow = c(1,1)) ## with these parameters - margin and how many figures if rows and columns
+a <- plot(hc, hang = -1, xlab = "Species", mgp=c(1,0,1) xlabsub ="", main = "Species Relatedness")
+dev.off()
