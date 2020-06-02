@@ -1,0 +1,19 @@
+# Use a regression analysis with a causation clause
+test2 <- cor.test(df$chl, df$taxa, method="pearson")
+test2
+#If the p-value is < 5%, then the correlation between x and y is significant.
+
+# Base plot
+
+plot(df$chl, df$taxa, xlab='Chl',ylab='Taxa')
+model <- lm(data = df, chl ~ taxa)
+qqnorm(model$residuals)
+qqline(model$residuals,col='red')
+plot(model$fitted.values,model$residuals,xlab='Fitted Values',ylab='Residuals')
+abline(h=0,col='red')
+summary(model)
+
+# Use ANOVA to compare regression lines if there is more than one base plot/test
+
+model.2 <- aov(chl ~ biomass*taxa, data=df)
+summary(model.2)
