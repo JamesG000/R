@@ -1,0 +1,36 @@
+#------------------------------
+#
+#
+#       PCA data ordination MDS
+#
+#
+#------------------------------
+
+
+#create a distance matrix where the samples are the rows, if already that way then remove the t
+
+#line below should create a data matrix from df
+DM <- matrix(as.numeric(unlist(t1)),nrow=nrow(t1))
+DM <- t(DM)
+#DM has rows of fish
+row.names(DM) <- colnames(t1)
+distance.matrix <- dist(scale(t(DM), center = T, scale = T),
+                        method = "euclidean")
+mds.stuff <- cmdscale(distance.matrix, eig = T, x.ret = T)
+mds.var.per <- round(mds.stuff$eig/sum(mds.stuff$eig)*100, 1)
+mds.values <- mds.stuff$points
+mds.data <- data.frame(Sample = rownames(t1),
+                         X = mds.values[,1],
+                         Y = mds.values[,2])
+
+
+ggplot(data=mds.data, aes(x=X, y=Y, label = Sample))+
+  geom_text()+
+  theme_bw()+
+  xlab(paste("MDS1 - ", mds.var.per[1], "%", sep = ""))+
+  ylab(paste("MDS2 - ", mds.var.per[2], "%", sep = ""))+
+  ggtitle("MDS plot using Euclidean distance")
+  
+  
+  
+  
