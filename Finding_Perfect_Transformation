@@ -1,0 +1,2 @@
+# Take in a column of data and creates a new column with a tranformation factor to give the closet possible normal distribution
+left_skew_zoo_v3$Perfect_power = transformTukey(left_skew_zoo_v2$Density, plotit=FALSE)
