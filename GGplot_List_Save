@@ -1,0 +1,11 @@
+for (i in 1:length(plotlist)){
+  # Find the name of each item in the list
+  ii = paste(names(plotlist[i]))
+  # Create a name vector
+  plot_name = paste("Figures/", ii, ".tiff", sep = "")
+  # Create image
+  tiff(plot_name)
+  # Print to image
+  print(plotlist[[i]])
+  dev.off()
+}
