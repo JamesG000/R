@@ -1,0 +1,31 @@
+# Finds the linear regression equation
+lm_eqn.1 <- function(dfbiomass){
+  m <- lm(y1 ~ x1, dfbiomass);
+  eq <- substitute(italic(y) == a + b %.% italic(x)*"," ~~italic(r)^2~"="~r2, 
+                   list(a = format(unname(coef(m)[1]), digits = 2),
+                        b = format(unname(coef(m)[2]), digits = 2),
+                        r2 = format(summary(m)$r.squared, digits = 3)))
+  as.character(as.expression(eq));
+}
+
+
+g <- 
+  ggplot()+
+  geom_point(data=df, aes(x=chl, y=biomass, col="Biomass"))+
+  geom_smooth(data=df, aes(x=chl, y=biomass, col="Biomass"), method= "lm", formula = my.formula, se = F)+
+  
+  # Annotates the linear regression equation to the plot
+  annotate(geom="text", x=0.8, y=1.1, label=lm_eqn.1(dfbiomass), color="black", parse = TRUE)+ #adds y= and r2 value to plot using above function
+  annotate(geom="text", x=0.94, y=0.52, label="P > 0.05", color="black", parse = TRUE)+
+  
+  
+  theme(panel.background = element_blank(), axis.line = element_line(colour = "black"),
+        panel.grid.minor = element_line())+
+  theme(legend.position = c(0.99, 0.15), legend.justification = c("right", "top"), legend.direction = "horizontal",
+       legend.title = element_blank())+
+  theme(legend.position = "none")+
+  xlab(bquote("Chlorophyll a Concentration (mg/L)"))+
+  ylab(bquote("Total Invertebrate Biomass (g)"))+
+  scale_y_continuous(limits = c(0, 11))
+
+plot(g)
