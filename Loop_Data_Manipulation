@@ -1,0 +1,215 @@
+# Loop over each file and perform the edits
+for (dataFileName in dataFileNames){
+  setwd ("C:/Users/HP/Desktop/Studio R/Abb/Data/Raw_Off")
+  # Read the csv (works)
+  a <- read_table(paste0(dataFileName))
+  
+  ##################
+  #
+  #
+  # Data frame manipulation
+  #
+  #
+  ##################
+  
+  b <- a[c(905:75444),]
+  colnames(b) <- "TEMP_COL_NAME"
+  
+  # Create temp col names
+  vec <- as.vector(1:146)
+  chrvec <- as.character(vec)
+  
+  # Seperate into cols using chrvec above
+  c <- separate(data=b,col=TEMP_COL_NAME, into=chrvec, sep = ",")
+  
+  d <- c[2:72875,]
+  
+  
+  #####################
+  #
+  #
+  # Works out the column names
+  #
+  #
+  ######################
+  
+  
+  # Subset data where the col names can be found
+  nameCols <- a[c(110:904),]
+  colnames(nameCols) <- "TEMP_COL_NAME"
+  
+  # Create temp col names
+  vec1 <- as.vector(1:38)
+  chrvec1 <- as.character(vec1)
+  
+  # Seperate the text into multiple cols
+  nameCols1 <- separate(data = nameCols, col=TEMP_COL_NAME, into=chrvec1, sep=",")
+  
+  # Get the col with the right data
+  nameCols2 <- nameCols1[,c(2,3,4)]
+  colnames(nameCols2) <- c("First", "Number", "Title")
+  nameCols3 <- nameCols2
+  
+  # Subs in one of the ones throwing an error
+  nameCols3$Title <- gsub("global", "Global", nameCols3$Title)
+  
+  # Remove all rows that dont have name in them
+  nameCols3 <- nameCols3[c(grep("name", nameCols3$First)),]
+  
+  # Remove all rows that dont start with a capital
+  nameCols3 <- nameCols3[c(grep("[A-Z]|[0-9]", nameCols3$Title)),]
+  
+  # Fill col names with col created above
+  colnames(d) <- nameCols3$Title
+  
+  
+  
+  #######################
+  #
+  #
+  # Create subset of the data needed for analysis
+  #
+  #
+  #######################
+  
+  # Needed: Year, Month, Day, Station ID (Row 12), Lat, Long, Air, Hor Vis, Vert Vis, Max Air Temp,
+  # Min Air Temp,
+  # Possible error at this location!
+  #Rainfall, Rainfall2, Precip, Sunlight Dur Hour, Net Rad Hour, Diffuse rad, 
+  #Net long wave rad,
+  # Net short wave rad, Direct solar rad, SST,
+  # Rows: 1, 2, 3, 12, 14, 15, 28, 33, 35, 46, 48, 53, 56, 58, 77, 78, 80, 81, 82, 84, 95,
+  # Subset for station ID - location
+  
+  # Subset for parameters wanted
+  subdf <- d[,c(1, 2, 3, 12, 14, 15, 28, 33, 35, 46, 48, 53, 56, 58, 77, 78, 80, 81, 82, 84, 95)]
+  
+  subdfHeaders = c("Year", "Month", "Day", "Station_ID", "Lat", "Long", "Air_Temp", "Hor_Vis", "Vert_Vis", 
+                   "Max_Air_Temp","Min_Temp", "Rainfall_One", "Rainfall_Two", "Total_Precip", "Sunlight_Hours", 
+                   "Net_Radiation", "Diffused_Radiation", "Long_Wave_Radiation", "Short_Wave_Radiation",
+                   "Direct_Radiation", "SST")
+  
+  colnames(subdf) <- subdfHeaders
+  
+  # Create date col
+  subdf$Date <- as.Date(with(subdf, paste(Year, Month, Day,sep="-")), "%Y-%m-%d")
+  subdf <- subdf[, c(22,1:21)]
+  
+  # Subset for lat and long
+  subdf2 <- subdf
+  subdf2$Lat <- as.numeric(subdf2$Lat)
+  subdf2$Long <- as.numeric(subdf2$Long)
+  subdf3 <- subset(subdf2, Lat > 51.3 & Lat < 52.3 & Long > 0 & Long < 1 )
+  
+  # Substitute some random number for NA
+  subdf3$Air_Temp[subdf3$Air_Temp == "-9999999.000"] <- NA
+  subdf3$Hor_Vis[subdf3$Hor_Vis == "-9999999.000"] <- NA
+  subdf3$Vert_Vis[subdf3$Vert_Vis == "-9999999.000"] <- NA
+  subdf3$Max_Air_Temp[subdf3$Max_Air_Temp == "-9999999.000"] <- NA
+  subdf3$Min_Temp[subdf3$Min_Temp == "-9999999.000"] <- NA
+  subdf3$Rainfall_One[subdf3$Rainfall_One == "-9999999.000"] <- NA
+  subdf3$Rainfall_Two[subdf3$Rainfall_Two == "-9999999.000"] <- NA
+  subdf3$Total_Precip[subdf3$Total_Precip == "-9999999.000"] <- NA
+  subdf3$Sunlight_Hours[subdf3$Sunlight_Hours == "-9999999.000"] <- NA
+  subdf3$Net_Radiation[subdf3$Net_Radiation == "-9999999.000"] <- NA
+  subdf3$Diffused_Radiation[subdf3$Diffused_Radiation == "-9999999.000"] <- NA
+  subdf3$Long_Wave_Radiation[subdf3$Long_Wave_Radiation == "-9999999.000"] <- NA
+  subdf3$Short_Wave_Radiation[subdf3$Short_Wave_Radiation == "-9999999.000"] <- NA
+  subdf3$Direct_Radiation[subdf3$Direct_Radiation == "-9999999.000"] <- NA
+  subdf3$SST[subdf3$SST == "-9999999.000"] <- NA
+  
+  subdf4 <- subdf3
+  cols.num <- c("Lat", "Long", "Air_Temp", "Hor_Vis", "Vert_Vis", 
+                "Max_Air_Temp","Min_Temp", "Rainfall_One", "Rainfall_Two", "Total_Precip", "Sunlight_Hours", 
+                "Net_Radiation", "Diffused_Radiation", "Long_Wave_Radiation", "Short_Wave_Radiation",
+                "Direct_Radiation", "SST")
+  
+  subdf4[cols.num] <- sapply(subdf4[cols.num],as.numeric)
+  sapply(subdf4, class)
+  
+  
+  # Generate mean data for the day
+  meandf <- data.frame(
+    Date = mean(subdf4$Date),
+    Air_Temp = as.numeric(mean(subdf4$Air_Temp, na.rm = T)),
+    Hor_Vis = mean(subdf4$Hor_Vis, na.rm = T),
+    Vert_Vis = mean(subdf4$Vert_Vis, na.rm = T),
+    Max_Air_Temp = mean(subdf4$Max_Air_Temp, na.rm = T),
+    Min_Temp = mean(subdf4$Min_Temp, na.rm = T),
+    Rainfall_One = mean(subdf4$Rainfall_One, na.rm = T),
+    Rainfall_Two = mean(subdf4$Rainfall_Two, na.rm = T),
+    Total_Precip = mean(subdf4$Total_Precip, na.rm = T),
+    Sunlight_Hours = mean(subdf4$Sunlight_Hours, na.rm = T),
+    Net_Radiation = mean(subdf4$Net_Radiation, na.rm = T),
+    Diffused_Radiation = mean(subdf4$Diffused_Radiation, na.rm = T),
+    Long_Wave_Radiation = mean(subdf4$Long_Wave_Radiation, na.rm = T),
+    Short_Wave_Radiation = mean(subdf4$Short_Wave_Radiation, na.rm = T),
+    Direct_Radiation = mean(subdf4$Direct_Radiation, na.rm = T),
+    SST = mean(subdf4$SST, na.rm = T)
+  )
+  
+  # Create the standard error for the day as well
+  SEdf <- data.frame(
+    Air_Temp_SE = as.numeric(sd(subdf4$Air_Temp, na.rm = T)/sqrt(length(subdf4$Air_Temp))),
+    Hor_Vis_SE = sd(subdf4$Hor_Vis, na.rm = T)/sqrt(length(subdf4$Hor_Vis)),
+    Vert_Vis_SE = sd(subdf4$Vert_Vis, na.rm = T)/sqrt(length(subdf4$Vert_Vis)),
+    Max_Air_Temp_SE = sd(subdf4$Max_Air_Temp, na.rm = T)/sqrt(length(subdf4$Max_Air_Temp)),
+    Min_Temp_SE = sd(subdf4$Min_Temp, na.rm = T)/sqrt(length(subdf4$Min_Temp)),
+    Rainfall_One_SE = sd(subdf4$Rainfall_One, na.rm = T)/sqrt(length(subdf4$Rainfall_One)),
+    Rainfall_Two_SE = sd(subdf4$Rainfall_Two, na.rm = T)/sqrt(length(subdf4$Rainfall_Two)),
+    Total_Precip_SE = sd(subdf4$Total_Precip, na.rm = T)/sqrt(length(subdf4$Total_Precip)),
+    Sunlight_Hours_SE = sd(subdf4$Sunlight_Hours, na.rm = T)/sqrt(length(subdf4$Sunlight_Hours)),
+    Net_Radiation_SE = sd(subdf4$Net_Radiation, na.rm = T)/sqrt(length(subdf4$Net_Radiation)),
+    Diffused_Radiation_SE = sd(subdf4$Diffused_Radiation, na.rm = T)/sqrt(length(subdf4$Diffused_Radiation)),
+    Long_Wave_Radiation_SE = sd(subdf4$Long_Wave_Radiation, na.rm = T)/sqrt(length(subdf4$Long_Wave_Radiation)),
+    Short_Wave_Radiation_SE = sd(subdf4$Short_Wave_Radiation, na.rm = T)/sqrt(length(subdf4$Short_Wave_Radiation)),
+    Direct_Radiation_SE = sd(subdf4$Direct_Radiation, na.rm = T)/sqrt(length(subdf4$Direct_Radiation)),
+    SST_SE = sd(subdf4$SST, na.rm = T)/sqrt(length(subdf4$SST))
+  )
+  
+  sedf <- data.frame(
+    Date = mean(subdf4$Date),
+    Air_Temp_SE = as.numeric(sd(subdf4$Air_Temp, na.rm = T)/sqrt(length(subdf4$Air_Temp))),
+    Hor_Vis_SE = sd(subdf4$Hor_Vis, na.rm = T)/sqrt(length(subdf4$Hor_Vis)),
+    Vert_Vis_SE = sd(subdf4$Vert_Vis, na.rm = T)/sqrt(length(subdf4$Vert_Vis)),
+    Max_Air_Temp_SE = sd(subdf4$Max_Air_Temp, na.rm = T)/sqrt(length(subdf4$Max_Air_Temp)),
+    Min_Temp_SE = sd(subdf4$Min_Temp, na.rm = T)/sqrt(length(subdf4$Min_Temp)),
+    Rainfall_One_SE = sd(subdf4$Rainfall_One, na.rm = T)/sqrt(length(subdf4$Rainfall_One)),
+    Rainfall_Two_SE = sd(subdf4$Rainfall_Two, na.rm = T)/sqrt(length(subdf4$Rainfall_Two)),
+    Total_Precip_SE = sd(subdf4$Total_Precip, na.rm = T)/sqrt(length(subdf4$Total_Precip)),
+    Sunlight_Hours_SE = sd(subdf4$Sunlight_Hours, na.rm = T)/sqrt(length(subdf4$Sunlight_Hours)),
+    Net_Radiation_SE = sd(subdf4$Net_Radiation, na.rm = T)/sqrt(length(subdf4$Net_Radiation)),
+    Diffused_Radiation_SE = sd(subdf4$Diffused_Radiation, na.rm = T)/sqrt(length(subdf4$Diffused_Radiation)),
+    Long_Wave_Radiation_SE = sd(subdf4$Long_Wave_Radiation, na.rm = T)/sqrt(length(subdf4$Long_Wave_Radiation)),
+    Short_Wave_Radiation_SE = sd(subdf4$Short_Wave_Radiation, na.rm = T)/sqrt(length(subdf4$Short_Wave_Radiation)),
+    Direct_Radiation_SE = sd(subdf4$Direct_Radiation, na.rm = T)/sqrt(length(subdf4$Direct_Radiation)),
+    SST_SE = sd(subdf4$SST, na.rm = T)/sqrt(length(subdf4$SST))
+  )
+  
+  # Combine the two daily data frames together
+  daydf <- cbind(meandf, SEdf)
+  
+  
+  #######################
+  #
+  #
+  # Save the file
+  #
+  #
+  #######################
+  
+  
+  # Get file name (works)
+  #rawFileName <- strsplit(dataFileName, ".", fixed = TRUE)
+  #fileName <- rawFileName[[1]][1]
+  
+  # Create var in global environment using the filename and the subset dataframe used.
+  #assign(fileName, daydf)
+  
+  # Save the var as a new file in the local drive
+  # Add a new ending to the file name
+  setwd ("C:/Users/HP/Desktop/Studio R/Abb/Data/Edited_Off")
+  write.csv(daydf, file = paste0("Day_Data_", dataFileName), row.names = FALSE)
+  write.csv(meandf, file = paste0("Mean_Data_", dataFileName), row.names = FALSE)
+  write.csv(sedf, file = paste0("SE_Data_", dataFileName), row.names = FALSE)
+}
