@@ -1,0 +1,50 @@
+
+########################
+#
+#
+# Generate a plot based on the var
+#
+#
+########################
+
+
+plotlist = list()
+
+# Goes along the columns missing the first as thats the dates
+for (i in 2:length(metaMeanData)){
+  
+  # Create the data to be plotted each iteration
+  meanplotdata <- cbind.data.frame(metaMeanData[[1]], metaMeanData[[i]])
+  colnames(meanplotdata) <- c("Date", "Var")
+  seplotdata <- cbind.data.frame(metaSEData[[1]], metaSEData[[i]])
+  colnames(seplotdata) <- c("Date_", "SE")
+  plotdata <- cbind(meanplotdata, seplotdata)
+  
+  # Find the title of the plot
+  title <- colnames(metaMeanData)[i]
+  
+    # Create plot
+    plot_obj <- ggplot(data=plotdata, aes(x = Date, y = Var, ymin = Var - SE, ymax = Var + SE))+ 
+    
+      #creates the plots of i
+      geom_point(aes(col = "Red", size = 12))+ 
+      geom_errorbar()+ 
+    
+      # Below is asthetics
+      theme(panel.background = element_blank(), axis.line = element_line(colour = "black"),
+            panel.grid.minor = element_line())+
+      theme(legend.position = "bottom")+
+      labs(title = "Key")+
+      xlab(bquote("Date"))+
+      ylab(bquote("Quantity"))+
+      ggtitle(title)
+    assign(title, plot_obj)
+    
+  # Assign the plot to the list
+  plotlist[[i]] <- plot_obj
+}
+    
+  # Create global var with title and the plot
+  #assign(title, plot_obj)
+plot_names <- colnames(metaMeanData)[-1]
+names(plotlist) <- plot_names 
