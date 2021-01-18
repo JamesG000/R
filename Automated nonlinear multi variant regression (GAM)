@@ -122,7 +122,7 @@ stepwise.multi.var.gam.func <- function(df, dependent.var){
   ###
   # Send to GlobEnv and save in local drive.
   ###
-  save.nme <- deparse(substitute(Apr17))
+  save.nme <- deparse(substitute(df))
   assign(paste0(save.nme,"_results"), df_to_save_sub, envir=globalenv()) # Send result to the global environment.
   write.csv(x = df_to_save_sub, file = paste0("Data/GAM_Regression_Results/", save.nme, ".csv"), row.names = FALSE)
   
