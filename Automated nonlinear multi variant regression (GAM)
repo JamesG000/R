@@ -1,111 +1,145 @@
+################################################################
+# Read before using.
+################################################################
+
+# To use define dataframe and the column header which is the
+# depdendent variable.
+# To use data must have varaibles as column headers.
+# The user must define which columns of the dataframe are to be
+# removed and thus leaving only the independent variables left.
+# This can be found on the first line inside the function.
+# The user can also adjust the signifancce levels that are used
+# to subset the meta file of outputs. Currently set to
+# p.value <0.05 | F.value <0.05.
+
+# This function was in a larger project and I dont currently have the time to remove packages
+# that arent used within the function.
+
+library(dplyr)
+library(Metrics)
+library(sjmisc) #may not need
+library(compositions)
+library(ggpubr)
+library(tidyverse)
+library(caret)
+library(leaps)
+library(MASS)
+library(rsm)
+library(tidyr)
+library(gam)
+library(mgcv)
+
 
 ####################################################################
-####################################################################
-####################################################################
-# Non linear multiple regression for all possiblities, analgous to stepwise linear regression but
-# dependent on parameters selected will output data to csv on local drive.
-####################################################################
+# GAM multiple variable regression for all possiblities, analgous to stepwise linear regression but
+# dependent on parameters selected will output data to csv on local drive and to local environment.
 ####################################################################
 
-
-############################
-# GAM formula
-############################
-
-# Takes in a dataframe variables along the columns.
-#
-#
-# USER:
-# User needs to define the column to be removed
-# User needs to edit where it says "Alg" twice,
-# must be the column name that was removed.
-# User needs to edit the save path.
-# User may wish to adjust k values.
-# User may wish to adjust significane level.
-
-
-Sep18_sub <- Sep18[,c(-1, -9, -11, -14, -15, -16)]
-
-###
-# Formula creation
-###
-
-var1 <- colnames(Sep18_sub)[-8] # USER EDIT. REMOVE DEPENDENT VARIABLE
-var2 <- var1
-vardf <- cbind.data.frame(var1, var2)
-colnames(vardf) <- c("first", "second")
-vardf <- expand(vardf, first, second)
-vardf <- vardf[apply(vardf, MARGIN =  1, FUN = function(x) !any(duplicated(x))), ] #creates df of all combinations
-
-covars <- paste("~ s(",vardf$first,", k = 30) + s(",vardf$second,", k = 30)") # USER ADJUSTMENT OF K POSSIBLE
-
-###
-# GAM function
-###
-
-gam.func <- function(x){
-  model <- gam(as.formula(paste0('Alg', x)), data = Aug16, method = "REML") # USER EDIT, SWAP ALG FOR EXP VAR NAME
-}
-
-###
-# Automated GAM function on all possible combinations of variables
-###
-
-gam.results <- lapply(covars, function(x) gam.func(x))
-gam.summary <- lapply(gam.results, summary)
-
-#####
-# Pulling data
-#####
-
-#r2, p, F, t
-
-
-lst <- list()
-for (i in seq(1:length(gam.summary))){
-  form <- gam.summary[[i]]$formula[3]
-  loop.df <- data.frame(
-    cbind(
-      form,
-      r2.adj = gam.summary[[i]]$r.sq,
-      var1.p = gam.summary[[i]]$s.table[1,4],
-      var2.p = gam.summary[[i]]$s.table[2,4],
-      var1.F = gam.summary[[i]]$s.table[1,3],
-      var2.F = gam.summary[[i]]$s.table[2,3],
-      t = gam.summary[[i]]$p.t
+stepwise.multi.var.gam.func <- function(df, dependent.var){
+  
+  df_sub <- df[,c(-1, -9, -11, -14, -15, -16)] # User to define which columns to keep.
+  
+  ###
+  # Formula creation
+  ###
+  
+  var1 <- colnames(df_sub)[-8] # USER EDIT. REMOVE DEPENDENT VARIABLE
+  var2 <- var1
+  vardf <- cbind.data.frame(var1, var2)
+  colnames(vardf) <- c("first", "second")
+  vardf <- expand(vardf, first, second)
+  vardf <- vardf[apply(vardf, MARGIN =  1, FUN = function(x) !any(duplicated(x))), ] #creates df of all combinations
+  
+  covars <- paste("~ s(",vardf$first,", k = 30) + s(",vardf$second,", k = 30)") # USER ADJUSTMENT OF K POSSIBLE
+  
+  ###
+  # GAM function
+  ###
+  
+  gam.func <- function(x){
+    model <- gam(as.formula(paste0(dependent.var, x)), data = df, method = "REML") # USER EDIT, SWAP ALG FOR EXP VAR NAME
+  }
+  
+  ###
+  # Automated GAM function on all possible combinations of variables
+  ###
+  
+  gam.results <- lapply(covars, function(x) gam.func(x))
+  gam.summary <- lapply(gam.results, summary)
+  
+  #####
+  # Pulling data
+  #####
+  
+  #r2, p, F, t
+  
+  
+  lst <- list()
+  for (i in seq(1:length(gam.summary))){
+    form <- gam.summary[[i]]$formula[3]
+    loop.df <- data.frame(
+      cbind(
+        form,
+        r2.adj = gam.summary[[i]]$r.sq,
+        var1.p = gam.summary[[i]]$s.table[1,4],
+        var2.p = gam.summary[[i]]$s.table[2,4],
+        var1.F = gam.summary[[i]]$s.table[1,3],
+        var2.F = gam.summary[[i]]$s.table[2,3],
+        t = gam.summary[[i]]$p.t
+      )
     )
-  )
-  lst[[i]] <- loop.df
+    lst[[i]] <- loop.df
+  }
+  
+  df_to_save <- as.data.frame(matrix(unlist(lst), nrow=length(lst), byrow=T))
+  colnames(df_to_save) <- c("Formula", "r2.adj", "var1.p", "var2.p", "var1.F", "var2.F", "t")
+  df_to_save$Formula <- as.character(df_to_save$Formula)
+  
+  # Formula regeneration
+  Form1 <- lapply(strsplit(df_to_save$Formula, split='(', fixed=TRUE), `[`, 2)
+  Form1.1 <- lapply(strsplit(matrix(unlist(Form1), nrow=length(Form1), byrow=T), split=',', fixed=TRUE), `[`, 1)
+  Form2 <- lapply(strsplit(df_to_save$Formula, split='(', fixed=TRUE), `[`, 3)
+  Form2.1 <- lapply(strsplit(matrix(unlist(Form2), nrow=length(Form2), byrow=T), split=',', fixed=TRUE), `[`, 1)
+  Form <- paste(dependent.var, Form1.1, "+", Form2.1) # USER EDIT, SWAP ALG FOR EXP VAR NAME
+  
+  df_to_save$Formula <- Form # Complete df
+  
+  # df is in a dataframe of lists
+  df_to_save$Formula <- as.character(unlist(df_to_save$Formula, use.names = FALSE))
+  df_to_save$r2.adj <- unlist(df_to_save$r2.adj, use.names = FALSE)
+  df_to_save$var1.p <- unlist(df_to_save$var1.p, use.names = FALSE)
+  df_to_save$var2.p <- unlist(df_to_save$var2.p, use.names = FALSE)
+  df_to_save$var1.F <- unlist(df_to_save$var1.F, use.names = FALSE)
+  df_to_save$var2.F <- unlist(df_to_save$var2.F, use.names = FALSE)
+  df_to_save$t <- unlist(df_to_save$t, use.names = FALSE)
+  
+  ###
+  # Remove non statistically significant results
+  ###
+  
+  df_to_save_sub <- subset(df_to_save, var1.F < 0.05 | var1.p < 0.05) # USER ADJUSTMENT POSSIBLE
+  
+  ###
+  # Send to GlobEnv and save in local drive.
+  ###
+  save.nme <- deparse(substitute(Apr17))
+  assign(save.nme, df_to_save_sub, envir=globalenv()) # Send result to the global environment.
+  write.csv(x = df_to_save_sub, file = paste0("Data/GAM_Regression_Results/", save.nme, ".csv"), row.names = FALSE)
+  
 }
 
-df_to_save <- as.data.frame(matrix(unlist(lst), nrow=length(lst), byrow=T))
-colnames(df_to_save) <- c("Formula", "r2.adj", "var1.p", "var2.p", "var1.F", "var2.F", "t")
-df_to_save$Formula <- as.character(df_to_save$Formula)
+####################################################################
+# Example
+####################################################################
 
-# Formula regeneration
-Form1 <- lapply(strsplit(df_to_save$Formula, split='(', fixed=TRUE), `[`, 2)
-Form1.1 <- lapply(strsplit(matrix(unlist(Form1), nrow=length(Form1), byrow=T), split=',', fixed=TRUE), `[`, 1)
-Form2 <- lapply(strsplit(df_to_save$Formula, split='(', fixed=TRUE), `[`, 3)
-Form2.1 <- lapply(strsplit(matrix(unlist(Form2), nrow=length(Form2), byrow=T), split=',', fixed=TRUE), `[`, 1)
-Form <- paste("Alg ~", Form1.1, "+", Form2.1) # USER EDIT, SWAP ALG FOR EXP VAR NAME
+# Example data
+Data <- as.dataframe(
+Algal_Levels = c(2,3,4,5,6,7),
+Precipitaion = c(2,3,4,5,6,7),
+Temperature c(2,3,4,5,6,7)
+)
 
-df_to_save$Formula <- Form # Complete df
 
-# df is in a dataframe of lists
-df_to_save$Formula <- as.character(unlist(df_to_save$Formula, use.names = FALSE))
-df_to_save$r2.adj <- unlist(df_to_save$r2.adj, use.names = FALSE)
-df_to_save$var1.p <- unlist(df_to_save$var1.p, use.names = FALSE)
-df_to_save$var2.p <- unlist(df_to_save$var2.p, use.names = FALSE)
-df_to_save$var1.F <- unlist(df_to_save$var1.F, use.names = FALSE)
-df_to_save$var2.F <- unlist(df_to_save$var2.F, use.names = FALSE)
-df_to_save$t <- unlist(df_to_save$t, use.names = FALSE)
-
-###
-# Remove non statistically significant results
-###
-
-df_to_save_sub <- subset(df_to_save, var1.F < 0.05 | var1.p < 0.05) # USER ADJUSTMENT POSSIBLE
-
-write.csv(df_to_save_sub, "Data/GAM_Regression_Results/Diatom/Sep18.csv", row.names = FALSE)
+stepwise.multi.var.gam.func(Data, "Algal_Levels")
 
 
