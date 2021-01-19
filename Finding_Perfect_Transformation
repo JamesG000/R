@@ -8,18 +8,22 @@ left_skew_zoo_v3$Perfect_power = transformTukey(left_skew_zoo_v2$Density, plotit
 dflst <- list(df1, df2)
 
 for (i in seq(1:length(dflst))){
-  # Getting the name can be overcomplicated if it is a date
-  # Could easily just be done with: nme <- dflst[[i]][[1]][1]
+  # Getting the name is overcomplicated for this example as it was a date
+  # nme <- dflst[[i]][[1]][1]
   nme <- as.character(dflst[[i]][[1]][1])
   nme.1 <- strsplit(nme, "-")[[1]][1]
   nme.2 <- strsplit(nme, "-")[[1]][2]
   nme <- paste0(nme.1, "_", nme.2)
-  
+  # Perform function.
   df <- dflst[[i]]
-  # Non numeric columns need to be removed.
-  # df <- df[,c(-1, -15, -16)]
-  trans.df <- apply(df,2,function(x) transformTukey(x))
-  df <- as.data.frame(trans.df)
-  assign(paste0(nme, "_trans"), df, envir = .GlobalEnv)
-  write.csv(df, file = paste0("Data/Transformed_Data_Distribution/", nme, ".csv"))
+  df.1 <- df[,c(-1, -15, -16)]
+  trans.df <- apply(df.1,2,function(x) transformTukey(x))
+  trans.df <- as.data.frame(trans.df)
+  # Put back in non numeric columns.
+  trans.df$Date <- df$Date
+  trans.df$Dom_Spec <- df$Dom_Spec
+  trans.df$Dom_Phy <- df$Dom_Phy
+  # Save
+  assign(paste0(nme, "_trans"), trans.df, envir = .GlobalEnv)
+  write.csv(trans.df, file = paste0("Data/Transformed_Data_Distribution/", nme, ".csv"))
 }
