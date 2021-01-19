@@ -25,5 +25,5 @@ for (i in seq(1:length(dflst))){
   trans.df$Dom_Phy <- df$Dom_Phy
   # Save
   assign(paste0(nme, "_trans"), trans.df, envir = .GlobalEnv)
-  write.csv(trans.df, file = paste0("Data/Transformed_Data_Distribution/", nme, ".csv"))
+  write.csv(trans.df, file = paste0("Data/Transformed_Data_Distribution/", nme, ".csv"), row.names = F)
 }
