@@ -19,5 +19,5 @@ for (i in seq(1:length(dflst))){
   trans.df <- apply(df.sub,2,function(x) transformTukey(x))
   df <- as.data.frame(trans.df)
   assign(paste0(nme, "_trans"), df, envir = .GlobalEnv)
-  write.csv(df, file = paste("Data/Transformed_Data_Distribution/", nme, ".csv"))
+  write.csv(df, file = paste0("Data/Transformed_Data_Distribution/", nme, ".csv"))
 }
