@@ -1,2 +1,16 @@
 # Take in a column of data and creates a new column with a tranformation factor to give the closet possible normal distribution
 left_skew_zoo_v3$Perfect_power = transformTukey(left_skew_zoo_v2$Density, plotit=FALSE)
+
+
+# Can be incorporated into a loop and vectorised to automate process.
+# Pass in a list of dataframes
+
+dflst <- list(df1, df2)
+
+for (i in seq(1:length(dflst))){
+  nme <- dflst[[i]][[1]][1]
+  trans.df <- apply(df.sub,2,function(x) transformTukey(x))
+  df <- as.data.frame(trans.df)
+  assign(paste0(nme, "_trans"), df, envir = .GlobalEnv)
+  write.csv(df, file = paste("Data/Transformed_Data", nme, ".csv"))
+}
