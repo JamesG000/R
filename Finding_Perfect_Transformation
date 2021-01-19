@@ -11,7 +11,7 @@ for (i in seq(1:length(dflst))){
 
   # Getting the name can be overcomplicated if it is a date
   # Could easily just be done with: nme <- dflst[[i]][[1]][1]
-  nme <- as.character(dflst[[1]][[1]][1])
+  nme <- as.character(dflst[[i]][[1]][1])
   nme.1 <- strsplit(nme, "-")[[1]][1]
   nme.2 <- strsplit(nme, "-")[[1]][2]
   nme <- paste0(nme.1, "_", nme.2)
