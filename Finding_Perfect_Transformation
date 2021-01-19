@@ -8,9 +8,16 @@ left_skew_zoo_v3$Perfect_power = transformTukey(left_skew_zoo_v2$Density, plotit
 dflst <- list(df1, df2)
 
 for (i in seq(1:length(dflst))){
-  nme <- dflst[[i]][[1]][1]
+
+  # Getting the name can be overcomplicated if it is a date
+  # Could easily just be done with: nme <- dflst[[i]][[1]][1]
+  nme <- as.character(dflst[[1]][[1]][1])
+  nme.1 <- strsplit(nme, "-")[[1]][1]
+  nme.2 <- strsplit(nme, "-")[[1]][2]
+  nme <- paste0(nme.1, "_", nme.2)
+   
   trans.df <- apply(df.sub,2,function(x) transformTukey(x))
   df <- as.data.frame(trans.df)
   assign(paste0(nme, "_trans"), df, envir = .GlobalEnv)
-  write.csv(df, file = paste("Data/Transformed_Data/", nme, ".csv"))
+  write.csv(df, file = paste("Data/Transformed_Data_Distribution/", nme, ".csv"))
 }
