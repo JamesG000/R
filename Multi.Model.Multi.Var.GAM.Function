@@ -125,29 +125,46 @@ multi.model.multi.var.GAM.automation.function <- function(df, dependent.var, k.v
   modelx.lst <- list()
   for (i in seq(1:length(modelx.summary))){
     form <- modelx.summary[[i]]$formula[3]
-    loop.df <- data.frame(
-      cbind(
-        form,
-        r2.adj = modelx.summary[[i]]$r.sq,
-        var1.p = modelx.summary[[i]]$s.table[4],
-        var1.F = modelx.summary[[i]]$s.table[3],
-        t = modelx.summary[[i]]$p.t
-      )
-    )
+    r2.adj <- modelx.summary[[i]]$r.sq
+    t = modelx.summary[[i]]$p.t
+    var1.p <- modelx.summary[[i]]$s.table[1,4]
+    var2.p <- tryCatch(modelx.summary[[i]]$s.table[2,4], error = function(e) 0)
+    var3.p <- tryCatch(modelx.summary[[i]]$s.table[3,4], error = function(e) 0)
+    var1.F <- modelx.summary[[i]]$s.table[1,3]
+    var2.F <- tryCatch(modelx.summary[[i]]$s.table[2,3], error = function(e) 0)
+    var3.F <- tryCatch(modelx.summary[[i]]$s.table[3,3], error = function(e) 0)
+    loop.df <- data.frame(cbind(
+      form=form, 
+      r2.adj=r2.adj,
+      var1.p=var1.p,
+      var2.p=var2.p,
+      var3.p=var3.p,
+      var1.F=var1.F,
+      var2.F=var2.F,
+      var3.F=var3.F,
+      t=t))
     modelx.lst[[i]] <- loop.df
   }
   
-  modelx_outputs <- as.data.frame(matrix(unlist(modelx.lst), nrow=length(modelx.lst), byrow=T))
-  modelx_outputs$A.I.C <- sapply(X = modelx.results, FUN = AIC)
-  colnames(modelx_outputs) <- c("Formula", "r2.adj", "var1.p", "var1.F", "t", "A.I.C")
-  modelx_outputs$Formula <- as.character(modelx_outputs$Formula)
+  
+  modelx_output <- as.data.frame(matrix(unlist(modelx.lst), nrow=length(modelx.lst), byrow=T))
+  modelx_output$A.I.C <- sapply(X = modelx.results, FUN = AIC)
+  colnames(modelx_output) <- c("Formula", "r2.adj", "var1.p", "var2.p", "var3.p", "var1.F", "var2.F", "var3.F", "t", "A.I.C")
+  
   #modelx_outputs
-  modelx_outputs$Formula <- as.character(unlist(modelx_outputs$Formula, use.names = FALSE))
-  modelx_outputs$r2.adj <- unlist(modelx_outputs$r2.adj, use.names = FALSE)
-  modelx_outputs$var1.p <- unlist(modelx_outputs$var1.p, use.names = FALSE)
-  modelx_outputs$var1.F <- unlist(modelx_outputs$var1.F, use.names = FALSE)
-  modelx_outputs$t <- unlist(modelx_outputs$t, use.names = FALSE)
-  modelx_outputs$A.I.C <- unlist(modelx_outputs$A.I.C, use.names = FALSE)
+  modelx_outputs$Formula <- as.character(unlist(modelx_output$Formula, use.names = FALSE))
+  modelx_outputs$r2.adj <- as.numeric(as.character(unlist(modelx_output$r2.adj, use.names = FALSE)))
+  modelx_outputs$var1.p <- as.numeric(as.character(unlist(modelx_output$var1.p, use.names = FALSE)))
+  modelx_outputs$var2.p <- as.numeric(as.character(unlist(modelx_output$var2.p, use.names = FALSE)))
+  modelx_outputs$var3.p <- as.numeric(as.character(unlist(modelx_output$var3.p, use.names = FALSE)))
+  modelx_outputs$var1.F <- as.numeric(as.character(unlist(modelx_output$var1.F, use.names = FALSE)))
+  modelx_outputs$var2.F <- as.numeric(as.character(unlist(modelx_output$var2.F, use.names = FALSE)))
+  modelx_outputs$var3.F <- as.numeric(as.character(unlist(modelx_output$var3.F, use.names = FALSE)))
+  modelx_outputs$t <- as.numeric(as.character(unlist(modelx_output$t, use.names = FALSE)))
+  modelx_outputs$A.I.C <- as.numeric(as.character(unlist(modelx_output$A.I.C, use.names = FALSE)))
+  
+  # Subset by p_values
+  modelx_P_outputs <- subset(modelx_outputs, var1.p < 0.05 & var2.p < 0.05 & var3.p < 0.05) # USER ADJUSTMENT POSSIBLE
   # Subset by p_values
   modelx_P_outputs <- subset(modelx_outputs, var1.p < 0.05) # USER ADJUSTMENT POSSIBLE
   # Subset by AIC
@@ -171,6 +188,7 @@ multi.model.multi.var.GAM.automation.function <- function(df, dependent.var, k.v
   #write.csv(x = modelx_Meta_outputs, file = paste0("Data/Multi_Model_GAM_Regression_Results_For_Transformed_Data/Visual_Subsets/", df.nme, "_modelx_Meta_Results.csv"), row.names = FALSE)
   
 }
+
 
 Example:
 Apr17 <- read.csv("Data/Transformed_Data_Distribution/Apr_17.csv")[,c(-14,-15,-16)]
