@@ -1,8 +1,10 @@
-library(data.table)
-library(mgcv)
-library(tidyr)
-library(dplyr)
+#!/usr/bin/Rscript
 
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
 ###
 # User notes:
 ###
@@ -10,6 +12,8 @@ library(dplyr)
 # To use supply a dataframe with variables as columns,
 # a string of the dependent variable and
 # the highest k-value you wish.
+#
+# Default is set to p < 0.05 for all variables
 
 ###
 # User edits needed:
@@ -25,6 +29,16 @@ library(dplyr)
 # Subset for top first variable p < 0.05
 # Subset for top 25 models using AIC()
 # Produces complete meta
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+###########################################################################################################################################################################################
+
+library(data.table)
+library(mgcv)
+library(tidyr)
+library(dplyr)
 
 
 multi.model.multi.var.GAM.automation.function <- function(df, dependent.var, k.value){
@@ -42,7 +56,7 @@ multi.model.multi.var.GAM.automation.function <- function(df, dependent.var, k.v
   # but also include them in subsequent variables if they also effect on
   # that variable i.e. week can have an effect of Algal but week can also
   # affect Sun and Sun affect Algal. (Think of chain reactions Week -> Sun -> Algal)
-  # German statisicaian refers to the error of not doing so as Marginalitätstheorem
+  # German statisicaian refers to the error of not doing so as Marginalit?tstheorem
   # But like this the model includes the main effects and the interaction
   #model4 <- gam(Alg ~ ti(dependent.varX, dependent.varY), data = df)
   #model5 <- gam(Alg ~ ti(dependent.varX) + ti(dependent.varX, dependent.varY), data = df)
@@ -158,6 +172,7 @@ multi.model.multi.var.GAM.automation.function <- function(df, dependent.var, k.v
   
 }
 
-
-#Example:
+Example:
+Apr17 <- read.csv("Data/Transformed_Data_Distribution/Apr_17.csv")[,c(-14,-15,-16)]
 multi.model.multi.var.GAM.automation.function(Apr17, "Alg", 30)
+
