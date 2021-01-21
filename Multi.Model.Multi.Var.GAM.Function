@@ -12,8 +12,6 @@
 # To use supply a dataframe with variables as columns,
 # a string of the dependent variable and
 # the highest k-value you wish.
-#
-# Default is set to p < 0.05 for all variables
 
 ###
 # User edits needed:
@@ -23,10 +21,10 @@
 # This is the last few lines of the function.
 
 ###
-# Default settings
+# Output settings (3 files)
 ###
 
-# Subset for top first variable p < 0.05
+# Subset for all variables is p < 0.05
 # Subset for top 25 models using AIC()
 # Produces complete meta
 ###########################################################################################################################################################################################
@@ -152,6 +150,7 @@ multi.model.multi.var.GAM.automation.function <- function(df, dependent.var, k.v
   colnames(modelx_output) <- c("Formula", "r2.adj", "var1.p", "var2.p", "var3.p", "var1.F", "var2.F", "var3.F", "t", "A.I.C")
   
   #modelx_outputs
+  modelx_outputs <- data.frame()
   modelx_outputs$Formula <- as.character(unlist(modelx_output$Formula, use.names = FALSE))
   modelx_outputs$r2.adj <- as.numeric(as.character(unlist(modelx_output$r2.adj, use.names = FALSE)))
   modelx_outputs$var1.p <- as.numeric(as.character(unlist(modelx_output$var1.p, use.names = FALSE)))
