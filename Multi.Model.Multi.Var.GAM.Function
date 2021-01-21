@@ -150,7 +150,7 @@ multi.model.multi.var.GAM.automation.function <- function(df, dependent.var, k.v
   colnames(modelx_output) <- c("Formula", "r2.adj", "var1.p", "var2.p", "var3.p", "var1.F", "var2.F", "var3.F", "t", "A.I.C")
   
   #modelx_outputs
-  modelx_outputs <- data.frame()
+  modelx_outputs <- data.frame(Formula = 1:length(row.names(modelx_output)))
   modelx_outputs$Formula <- as.character(unlist(modelx_output$Formula, use.names = FALSE))
   modelx_outputs$r2.adj <- as.numeric(as.character(unlist(modelx_output$r2.adj, use.names = FALSE)))
   modelx_outputs$var1.p <- as.numeric(as.character(unlist(modelx_output$var1.p, use.names = FALSE)))
