@@ -41,31 +41,6 @@ library(dplyr)
 
 multi.model.multi.var.GAM.automation.function <- function(df, dependent.var, k.value){
   
-  # Model Notes:
-  # s() assumes similar scaling in the variables
-  # therefore used ti()
-  
-  #All possible modesl up to 3 variables acting indpendently.
-  #model1 <- gam(Alg ~ ti(dependent.varX), data = df)
-  #model2 <- gam(Alg ~ ti(dependent.varX) + ti(depedent.varY), data = df)
-  #model3 <- gam(Alg ~ ti(dependent.varX) + ti(depedent.varY) + ti(dependent.varZ), data = df)
-  
-  # Include independent vairbales if they have an effect alone
-  # but also include them in subsequent variables if they also effect on
-  # that variable i.e. week can have an effect of Algal but week can also
-  # affect Sun and Sun affect Algal. (Think of chain reactions Week -> Sun -> Algal)
-  # German statisicaian refers to the error of not doing so as Marginalit?tstheorem
-  # But like this the model includes the main effects and the interaction
-  #model4 <- gam(Alg ~ ti(dependent.varX, dependent.varY), data = df)
-  #model5 <- gam(Alg ~ ti(dependent.varX) + ti(dependent.varX, dependent.varY), data = df)
-  
-  # Build a more detailed model
-  #model6 <- gam(Alg ~ ti(dependent.varX, dependent.varY) + ti(dependent.varX, dependent.varZ), data = df)
-  #model7 <- gam(Alg ~ ti(dependent.varX) + ti(dependent.varX, dependent.varY) + ti(dependent.varX, dependent.varZ), data = df)
-  
-  # Compare models or use ANOVA
-  #AIC(model1, model2, model3, model4, model5, model6, model7)
-  
   ##############################################################################################################################################################################
   # Function creation
   ##############################################################################################################################################################################
@@ -85,52 +60,156 @@ multi.model.multi.var.GAM.automation.function <- function(df, dependent.var, k.v
   # Create models
   k.value <- rev(1:k.value)
   models <- list()
+  model1.lst <- list()
+  model2.lst <- list()
+  model3.lst <- list()
+  model4.lst <- list()
+  model5.lst <- list()
+  model6.lst <- list()
+  model7.lst <- list()
+  model8.lst <- list()
+  model9.lst <- list()
+  model10.lst <- list()
+  model11.lst <- list()
+  model12.lst <- list()
+  model13.lst <- list()
+  model14.lst <- list()
+  model8.lst <- list()
+  model9.lst <- list()
+  model10.lst <- list()
+  model11.lst <- list()
+  model12.lst <- list()
+  model13.lst <- list()
+  model14.lst <- list()
+  
+  
   for (i in seq(1:length(k.value))){
-    model1 <- paste("~ ti(", var1, ", k = ", k.value, ")")
-    model2 <- paste("~ ti(", vardf.2$first, ", k =", k.value, ") + ti(", vardf.2$second, ", k = ", k.value, ")")
-    model3 <- paste("~ ti(", vardf.3$first, ", k = ", k.value, ") + ti(", vardf.3$second, ", k = ", k.value, ") + ti(", vardf.3$third, ", k = ", k.value, ")")
-    model4 <- paste("~ ti(", vardf.2$first, ",", vardf.2$second, ", k = ", k.value, ")")
-    model5 <- paste("~ ti(", vardf.2$first, ", k = ", k.value, ") + ti(", vardf.2$first, ",", vardf.2$second, ", k = ", k.value, ")")
-    model6 <- paste("~ ti(", vardf.3$first, ",", vardf.3$second, ", k = ", k.value, ") + ti(", vardf.3$first, ",", vardf.3$third, ", k = ", k.value, ")")
-    model7 <- paste("~ ti(", vardf.3$first, ", k = ", k.value, ") + ti(", vardf.3$first, ",", vardf.3$second, ", k = ", k.value, ") + ti(", vardf.3$first, ",", vardf.3$third, ", k = ", k.value, ")")
-    modelx <- c(model1, model2, model3, model4, model5, model6)
-    models[[i]] <- modelx
+    model1 <- paste("~ s(", var1, ", k = ", k.value[i], ")")
+    model1.lst[[i]] <- model1
   }
+  model1.df <- unlist(model1.lst)
   
-  models <- as.data.frame(matrix(unlist(models), nrow=length(models), byrow=T))
-  models <- data.frame(model = c(t(models)), stringsAsFactors=FALSE)
-  models <- models[["model"]]
-  
-  ###
-  # GAM function
-  ###
-  gam.func <- function(x){
-    tryCatch(model <- gam(as.formula(paste0(dependent.var, x)), data = df, method = "ML", select = TRUE),
-             error = function(e) message("Problem....", as.character(e)))
+  for (i in seq(1:length(k.value))){
+    model2 <- paste("~ s(", vardf.2$first, ", k =", k.value[i], ") + s(", vardf.2$second, ", k = ", k.value[i], ")")
+    model2.lst[[i]] <- model2
   }
-  ###
+  model2.df <- unlist(model2.lst)
+  
+  for (i in seq(1:length(k.value))){
+    model3 <- paste("~ s(", vardf.3$first, ", k = ", k.value[i], ") + s(", vardf.3$second, ", k = ", k.value[i], ") + s(", vardf.3$third, ", k = ", k.value[i], ")")
+    model3.lst[[i]] <- model3
+  }
+  model3.df <- unlist(model3.lst)
+  
+  for (i in seq(1:length(k.value))){
+    model4 <- paste("~ s(", vardf.2$first, ",", vardf.2$second, ", k = ", k.value[i], ")")
+    model4.lst[[i]] <- model4
+  }
+  model4.df <- unlist(model4.lst)
+  
+  for (i in seq(1:length(k.value))){
+    model5 <- paste("~ s(", vardf.2$first, ", k = ", k.value[i], ") + s(", vardf.2$first, ",", vardf.2$second, ", k = ", k.value[i], ")")
+    model5.lst[[i]] <- model5
+  }
+  model5.df <- unlist(model5.lst)
+  
+  for (i in seq(1:length(k.value))){
+    model6 <- paste("~ s(", vardf.3$first, ",", vardf.3$second, ", k = ", k.value[i], ") + s(", vardf.3$first, ",", vardf.3$third, ", k = ", k.value[i], ")")
+    model6.lst[[i]] <- model6
+  }
+  model6.df <- unlist(model6.lst)
+  
+  for (i in seq(1:length(k.value))){
+    model7 <- paste("~ s(", vardf.3$first, ", k = ", k.value[i], ") + s(", vardf.3$first, ",", vardf.3$second, ", k = ", k.value[i], ") + s(", vardf.3$first, ",", vardf.3$third, ", k = ", k.value[i], ")")
+    model7.lst[[i]] <- model7
+  }
+  model7.df <- unlist(model7.lst)
+  
+  for (i in seq(1:length(k.value))){
+    model8 <- paste("~ ti(", var1, ", k = ", k.value[i], ")")
+    model8.lst[[i]] <- model8
+  }
+  model8.df <- unlist(model8.lst)
+  
+  for (i in seq(1:length(k.value))){
+    model9 <- paste("~ ti(", vardf.2$first, ", k =", k.value[i], ") + ti(", vardf.2$second, ", k = ", k.value[i], ")")
+    model9.lst[[i]] <- model9
+  }
+  model9.df <- unlist(model9.lst)
+  
+  for (i in seq(1:length(k.value))){
+    model10 <- paste("~ ti(", vardf.3$first, ", k = ", k.value[i], ") + ti(", vardf.3$second, ", k = ", k.value[i], ") + ti(", vardf.3$third, ", k = ", k.value[i], ")")
+    model10.lst[[i]] <- model10
+  }
+  model10.df <- unlist(model10.lst)
+  
+  for (i in seq(1:length(k.value))){
+    model11 <- paste("~ ti(", vardf.2$first, ",", vardf.2$second, ", k = ", k.value[i], ")")
+    model11.lst[[i]] <- model11
+  }
+  model11.df <- unlist(model11.lst)
+  
+  for (i in seq(1:length(k.value))){
+    model12 <- paste("~ ti(", vardf.2$first, ", k = ", k.value[i], ") + ti(", vardf.2$first, ",", vardf.2$second, ", k = ", k.value[i], ")")
+    model12.lst[[i]] <- model12
+  }
+  model12.df <- unlist(model12.lst)
+  
+  for (i in seq(1:length(k.value))){
+    model13 <- paste("~ ti(", vardf.3$first, ",", vardf.3$second, ", k = ", k.value[i], ") + ti(", vardf.3$first, ",", vardf.3$third, ", k = ", k.value[i], ")")
+    model13.lst[[i]] <- model13
+  }
+  model13.df <- unlist(model13.lst)
+  
+  for (i in seq(1:length(k.value))){
+    model14 <- paste("~ ti(", vardf.3$first, ", k = ", k.value[i], ") + ti(", vardf.3$first, ",", vardf.3$second, ", k = ", k.value[i], ") + ti(", vardf.3$first, ",", vardf.3$third, ", k = ", k.value[i], ")")
+    model14.lst[[i]] <- model14
+  }
+  model14.df <- unlist(model14.lst)
+  
+    
+  models <- c(model1.df, model2.df, model3.df, model4.df, model5.df, model6.df, model7.df, model8.df, model9.df, model10.df, model11.df, model12.df, model13.df, model14.df)
+  
+  forms <- lapply(models, function(x) paste(dependent.var, x))
+  forms1 <- unlist(forms)
+  
+  
+  #forms1 <- lapply(models, function(x) paste0(dependent.var, x, ", data = df, method = 'ML', select = TRUE"))
+  
+  ###############################################################################################################
   # GAM implementation
-  ###
+  ###############################################################################################################
   # Automated GAM function on all possible combinations of
-  # variables for all models
   
-  ###############################################################################################################
-  # All Models
-  ###############################################################################################################
-  modelx.results <- lapply(models, function(x) gam.func(x))
-  modelx.summary <- lapply(modelx.results, summary)
+  
+  modelx.results <- list()
+  
+  tryCatch(
+    for(i in seq(1:length(forms1))){
+      g <- gam(as.formula(forms1[i]), data = df, method = 'ML', select = TRUE )
+      modelx.results[[i]] <- g
+    },
+    error = function(e) message("modelx.results.....", as.character(e))
+  )
+  
+  
+  
+  
+  modelx.summary <- tryCatch(lapply(modelx.results, function(x) summary(x)), error = function(e) message("modelx.summary.......", as.character(e)))
+  
   
   modelx.lst <- list()
+  
   for (i in seq(1:length(modelx.summary))){
     form <- modelx.summary[[i]]$formula[3]
     r2.adj <- modelx.summary[[i]]$r.sq
-    t <- modelx.summary[[i]]$p.t
+    t = modelx.summary[[i]]$p.t
     var1.p <- modelx.summary[[i]]$s.table[1,4]
-    var2.p <- tryCatch(modelx.summary[[i]]$s.table[2,4], error = function(e) 0)
-    var3.p <- tryCatch(modelx.summary[[i]]$s.table[3,4], error = function(e) 0)
+    var2.p <- tryCatch(modelx.summary[[i]]$s.table[2,4], error = function(e) -9999)
+    var3.p <- tryCatch(modelx.summary[[i]]$s.table[3,4], error = function(e) -9999)
     var1.F <- modelx.summary[[i]]$s.table[1,3]
-    var2.F <- tryCatch(modelx.summary[[i]]$s.table[2,3], error = function(e) 0)
-    var3.F <- tryCatch(modelx.summary[[i]]$s.table[3,3], error = function(e) 0)
+    var2.F <- tryCatch(modelx.summary[[i]]$s.table[2,3], error = function(e) -9999)
+    var3.F <- tryCatch(modelx.summary[[i]]$s.table[3,3], error = function(e) -9999)
     loop.df <- data.frame(cbind(
       form=form, 
       r2.adj=r2.adj,
@@ -149,7 +228,7 @@ multi.model.multi.var.GAM.automation.function <- function(df, dependent.var, k.v
   modelx_output$A.I.C <- sapply(X = modelx.results, FUN = AIC)
   colnames(modelx_output) <- c("Formula", "r2.adj", "var1.p", "var2.p", "var3.p", "var1.F", "var2.F", "var3.F", "t", "A.I.C")
   
-  #modelx_outputs
+  # Modelx_outputs
   modelx_outputs <- data.frame(Formula = 1:length(row.names(modelx_output)))
   modelx_outputs$Formula <- as.character(unlist(modelx_output$Formula, use.names = FALSE))
   modelx_outputs$r2.adj <- as.numeric(as.character(unlist(modelx_output$r2.adj, use.names = FALSE)))
@@ -163,11 +242,8 @@ multi.model.multi.var.GAM.automation.function <- function(df, dependent.var, k.v
   modelx_outputs$A.I.C <- as.numeric(as.character(unlist(modelx_output$A.I.C, use.names = FALSE)))
   
   # Subset by p_values
-  modelx_P_outputs <- subset(modelx_outputs, var1.p < 0.05 & var2.p < 0.05 & var3.p < 0.05) # USER ADJUSTMENT POSSIBLE
-  # Subset by p_values
   modelx_P_outputs <- subset(modelx_outputs, var1.p < 0.05) # USER ADJUSTMENT POSSIBLE
   # Subset by AIC
-  df.nme <- deparse(substitute(df))
   modelx_AIC_outputs <- as.data.table(modelx_outputs)
   modelx_AIC_outputs <- modelx_AIC_outputs[, .SD[A.I.C %in% head(sort(unique(A.I.C)), 25)]]
   # Full Meta
@@ -177,14 +253,13 @@ multi.model.multi.var.GAM.automation.function <- function(df, dependent.var, k.v
   #assign(paste0(df.nme, "_modelx_P_outputs"), modelx_P_outputs, envir=globalenv()) # Send result to the global environment.
   #assign(paste0(df.nme, "_modelx_AIC_outputs"), modelx_AIC_outputs, envir=globalenv()) # Send result to the global environment.
   #assign(paste0(df.nme, "_modelx_Meta_outputs"), modelx_Meta_outputs, envir=globalenv()) # Send result to the global environment.
-  
-  write.csv(x = modelx_P_outputs, file = paste0("GAM_data/Outputs/", df.nme, "_modelx_P_Results.csv"), row.names = FALSE)
-  write.csv(x = modelx_AIC_outputs, file = paste0("GAM_data/Outputs/", df.nme, "_modelx_AIC_Results.csv"), row.names = FALSE)
-  write.csv(x = modelx_Meta_outputs, file = paste0("GAM_data/Outputs/", df.nme, "_modelx_Meta_Results.csv"), row.names = FALSE)
-  
   #write.csv(x = modelx_P_outputs, file = paste0("Data/Multi_Model_GAM_Regression_Results_For_Transformed_Data/Visual_Subsets/", df.nme, "_modelx_P_Results.csv"), row.names = FALSE)
   #write.csv(x = modelx_AIC_outputs, file = paste0("Data/Multi_Model_GAM_Regression_Results_For_Transformed_Data/Visual_Subsets/", df.nme, "_modelx_AIC_Results.csv"), row.names = FALSE)
   #write.csv(x = modelx_Meta_outputs, file = paste0("Data/Multi_Model_GAM_Regression_Results_For_Transformed_Data/Visual_Subsets/", df.nme, "_modelx_Meta_Results.csv"), row.names = FALSE)
+  
+  write.csv(x = modelx_P_outputs, file = paste0("GAM_data/Outputs/", "Aug16", "_modelx_P_Results.csv"), row.names = FALSE)
+  write.csv(x = modelx_AIC_outputs, file = paste0("GAM_data/Outputs/", "Aug16", "_modelx_AIC_Results.csv"), row.names = FALSE)
+  write.csv(x = modelx_Meta_outputs, file = paste0("GAM_data/Outputs/", "Aug16", "_modelx_Meta_Results.csv"), row.names = FALSE)
   
 }
 
