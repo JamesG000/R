@@ -3,6 +3,8 @@
 # User Notes:
 # Supply a dataframe for df and strings for all the rest
 # Plots to the Ui in RStudio
+# Can save to lcoal drive
+# Needs last line edit for location of local drive
 #
 ##################################################################################
 
@@ -30,5 +32,6 @@ contour.plot.func <- function(df, plot.name,
   x.nme <- list(title = paste(x.variable.name), size = 18)
   y.nme <- list(title = paste(y.variable.name), size = 18)
   plt <- plt %>% layout(xaxis=x.nme, yaxis=y.nme, title = paste(plot.name))
-  plt
+  plt # plot to UI
+  #orca(plt, file = paste0("Plots/Contour Plots/", plot.name, ".png")) # Save to local drive
 }
