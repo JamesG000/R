@@ -1,0 +1,30 @@
+#################################################################################
+#
+# User Notes:
+# Supply a dataframe for df and strings for all the rest
+# Plots to the Ui in RStudio
+#
+##################################################################################
+
+
+
+contour.plot.func <- function(df, plot.name,
+                              x.variable, y.variable, z.variable,
+                              x.variable.name, y.variable.name, z.variable.name){
+
+  plt <- plot_ly(data = df,
+                 z = df[,z.variable],
+                 x = df[,x.variable],
+                 y = df[,y.variable],
+                 type = "contour",
+                 contours = list(showlabels = T,
+                                 labelfont = list(family = 'Raleway',
+                                                  color = 'white')
+                 )
+  )
+  plt <- plt %>% colorbar(title = paste(z.variable.name))
+  x.nme <- list(title = paste(x.variable.name), size = 18)
+  y.nme <- list(title = paste(y.variable.name), size = 18)
+  plt <- plt %>% layout(xaxis=x.nme, yaxis=y.nme, title = paste(plt.name))
+  plt
+}
