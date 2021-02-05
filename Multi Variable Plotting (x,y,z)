@@ -25,6 +25,6 @@ contour.plot.func <- function(df, plot.name,
   plt <- plt %>% colorbar(title = paste(z.variable.name))
   x.nme <- list(title = paste(x.variable.name), size = 18)
   y.nme <- list(title = paste(y.variable.name), size = 18)
-  plt <- plt %>% layout(xaxis=x.nme, yaxis=y.nme, title = paste(plt.name))
+  plt <- plt %>% layout(xaxis=x.nme, yaxis=y.nme, title = paste(plot.name))
   plt
 }
