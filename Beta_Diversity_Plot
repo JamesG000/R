@@ -1,5 +1,6 @@
 library(betapart)
 library(vegan)
+library(ggfortify)
 
 #--------------------------------------------
 #
